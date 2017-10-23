@@ -45,7 +45,7 @@ public class OI {
   }
   
   public double getThrottle() {
-    return xbox.getY(GenericHID.Hand.kLeft);
+    return -xbox.getY(GenericHID.Hand.kLeft);
   }
   
   public double getTurn() {
