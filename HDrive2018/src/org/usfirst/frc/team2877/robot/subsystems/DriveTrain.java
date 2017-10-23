@@ -52,8 +52,8 @@ public class DriveTrain extends Subsystem {
       
     }
     
-    public void tankDrive(double x, double y) {
-      robotDrive.arcadeDrive(x, y);
+    public void arcadeDrive(double throttle, double rotate) {
+      robotDrive.arcadeDrive(throttle, rotate);
     }
     
     public void strafe(double x) {
