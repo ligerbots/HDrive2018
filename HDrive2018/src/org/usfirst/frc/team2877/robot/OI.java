@@ -49,10 +49,10 @@ public class OI {
   }
   
   public double getTurn() {
-    return xbox.getX(GenericHID.Hand.kLeft);
+    return xbox.getX(GenericHID.Hand.kRight);
   }
   
   public double getStrafe() {
-    return xbox.getX(GenericHID.Hand.kRight);
+    return xbox.getX(GenericHID.Hand.kLeft);
   }
 }

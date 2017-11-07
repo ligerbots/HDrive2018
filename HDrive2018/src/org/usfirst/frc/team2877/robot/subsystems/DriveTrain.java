@@ -20,7 +20,7 @@ public class DriveTrain extends Subsystem {
     CANTalon rightMaster;
     CANTalon rightSlave;
     CANTalon centerMaster;
-    CANTalon centerSlave;
+//    CANTalon centerSlave;
     RobotDrive robotDrive;
     
     AHRS navx;
@@ -32,7 +32,7 @@ public class DriveTrain extends Subsystem {
       rightMaster = new CANTalon(RobotMap.CT_RIGHT_1);
       rightSlave = new CANTalon(RobotMap.CT_RIGHT_2);
       centerMaster = new CANTalon(RobotMap.CT_CENTER_1);
-      centerSlave = new CANTalon(RobotMap.CT_CENTER_2);
+//      centerSlave = new CANTalon(RobotMap.CT_CENTER_2);
       
       leftMaster.changeControlMode(TalonControlMode.PercentVbus);
       rightMaster.changeControlMode(TalonControlMode.PercentVbus);
@@ -40,13 +40,13 @@ public class DriveTrain extends Subsystem {
       
       leftSlave.changeControlMode(TalonControlMode.Follower);
       rightSlave.changeControlMode(TalonControlMode.Follower);
-      centerSlave.changeControlMode(TalonControlMode.Follower);
+//      centerSlave.changeControlMode(TalonControlMode.Follower);
       
       leftSlave.set(RobotMap.CT_LEFT_1);
       rightSlave.set(RobotMap.CT_RIGHT_1);
-      centerSlave.set(RobotMap.CT_CENTER_1);
+//      centerSlave.set(RobotMap.CT_CENTER_1);
       
-      Arrays.asList(leftMaster, rightMaster, leftSlave, rightSlave, centerMaster, centerSlave).forEach((CANTalon talon) -> talon.enableBrakeMode(true));
+      Arrays.asList(leftMaster, rightMaster, leftSlave, rightSlave, centerMaster/*, centerSlave*/).forEach((CANTalon talon) -> talon.enableBrakeMode(true));
       
       robotDrive = new RobotDrive(leftMaster, rightMaster);
       
