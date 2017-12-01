@@ -23,6 +23,7 @@ public class DriveTrain extends Subsystem {
     CANTalon centerMaster;
     CANTalon centerSlave;
     RobotDrive robotDrive;
+    boolean fieldCentric = false;
     
     AHRS navx;
     
@@ -59,8 +60,16 @@ public class DriveTrain extends Subsystem {
       
     }
     
-    public void arcadeDrive(double throttle, double rotate) {
-      robotDrive.arcadeDrive(throttle, rotate);
+    public void arcadeDrive(double throttle, double rotate, double strafe) {
+      if (fieldCentric) {
+        double scale = Math.max(Math.sin(getYaw()), Math.cos(getYaw()));
+        robotDrive.arcadeDrive(throttle * Math.cos(getYaw()) / scale, rotate);
+        centerMaster.set(strafe * Math.sin(getYaw()) / scale);
+      }
+      else {
+        robotDrive.arcadeDrive(throttle, rotate);
+        centerMaster.set(strafe);
+      }
     }
     
     public void strafe(double x) {
@@ -82,6 +91,15 @@ public class DriveTrain extends Subsystem {
     public void initDefaultCommand() {
         // Set the default command for a subsystem here.
         //setDefaultCommand(new MySpecialCommand());
+    }
+    
+    public void toggleFieldCentric() {
+        if (fieldCentric) {
+          fieldCentric = false;
+        }
+        else {
+          fieldCentric = true;
+        }
     }
 }
 
