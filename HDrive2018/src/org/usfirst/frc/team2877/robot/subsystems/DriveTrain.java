@@ -3,7 +3,9 @@ package org.usfirst.frc.team2877.robot.subsystems;
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.TalonControlMode;
 import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.RobotDrive;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.Arrays;
@@ -17,6 +19,7 @@ public class DriveTrain extends Subsystem {
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
     CANTalon leftMaster;
+    boolean navxOn = false;
     CANTalon leftSlave;
     CANTalon rightMaster;
     CANTalon rightSlave;
@@ -24,6 +27,7 @@ public class DriveTrain extends Subsystem {
     CANTalon centerSlave;
     RobotDrive robotDrive;
     boolean fieldCentric = false;
+    PIDController turningController;
     
     AHRS navx;
     
@@ -35,10 +39,14 @@ public class DriveTrain extends Subsystem {
       SmartDashboard.putNumber("Top Correction Angle", 10);
       SmartDashboard.putNumber("Middle Correction Angle", 5);
       
-      leftMaster = new CANTalon(RobotMap.CT_LEFT_1);
-      leftSlave = new CANTalon(RobotMap.CT_LEFT_2);
-      rightMaster = new CANTalon(RobotMap.CT_RIGHT_1);
-      rightSlave = new CANTalon(RobotMap.CT_RIGHT_2);
+      SmartDashboard.putNumber("turnP", 0.1);
+      SmartDashboard.putNumber("turnI", 0);
+      SmartDashboard.putNumber("turnD", 0.05);
+      
+      leftMaster = new CANTalon(RobotMap.CT_LEFT_2);
+      leftSlave = new CANTalon(RobotMap.CT_LEFT_1);
+      rightMaster = new CANTalon(RobotMap.CT_RIGHT_2);
+      rightSlave = new CANTalon(RobotMap.CT_RIGHT_1);
       centerMaster = new CANTalon(RobotMap.CT_CENTER_1);
       centerSlave = new CANTalon(RobotMap.CT_CENTER_2);
       
@@ -58,9 +66,10 @@ public class DriveTrain extends Subsystem {
       
       robotDrive = new RobotDrive(leftMaster, rightMaster);
       
+      navx = new AHRS(SPI.Port.kMXP, (byte) 200);
     }
     
-    public void arcadeDrive(double throttle, double rotate, double strafe) {
+    public void allDrive(double throttle, double rotate, double strafe) {
       if (fieldCentric) {
         double scale = Math.max(Math.sin(getYaw()), Math.cos(getYaw()));
         robotDrive.arcadeDrive(throttle * Math.cos(getYaw()) / scale, rotate);
@@ -92,6 +101,41 @@ public class DriveTrain extends Subsystem {
         // Set the default command for a subsystem here.
         //setDefaultCommand(new MySpecialCommand());
     }
+    
+    public boolean getNavXOn() {
+      return navxOn;
+    }
+    
+    public void toggleNavXControl() {
+      if (navxOn) {
+        navxOn = false;
+      }
+      else {
+        navxOn = true;
+      }
+    }
+    
+    public void checkTalonVoltage() {
+      Arrays.asList(leftMaster, rightMaster, leftSlave, rightSlave, centerMaster, centerSlave).forEach((CANTalon talon) -> SmartDashboard.putNumber(((Integer)talon.getDeviceID()).toString(), talon.getBusVoltage()));
+    }
+    
+   /* public void enableTurningControl(double angle, double tolerance) {
+      double startAngle = this.getAngle();
+      double temp = startAngle + angle;
+      RobotMap.TURN_P = turningController.getP();
+      RobotMap.TURN_D = turningController.getD();
+      RobotMap.TURN_I = turningController.getI();
+      temp = otherFixDegrees(temp);
+      turningController.setSetpoint(temp);
+      turningController.enable();
+      turningController.setInputRange(-180.0, 180.0);
+      turningController.setOutputRange(-1.0,1.0);
+      turningController.setAbsoluteTolerance(tolerance);
+      turningController.setToleranceBuffer(1);
+      turningController.setContinuous(true);
+      turningController.setSetpoint(temp);
+    }*/
+
     
     public void toggleFieldCentric() {
         if (fieldCentric) {

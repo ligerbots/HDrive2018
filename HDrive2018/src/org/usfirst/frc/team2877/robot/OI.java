@@ -2,8 +2,8 @@ package org.usfirst.frc.team2877.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.buttons.Button;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
+import org.usfirst.frc.team2877.robot.commands.FixDriveOnCommand;
 import org.usfirst.frc.team2877.robot.commands.ToggleFieldCentric;
 
 
@@ -47,6 +47,9 @@ public class OI {
     
     JoystickButton xBoxA = new JoystickButton(xbox, 1);
     xBoxA.whenPressed(new ToggleFieldCentric());
+    
+    JoystickButton xBoxB = new JoystickButton(xbox , 2);
+    xBoxB.whenPressed(new FixDriveOnCommand());
   }
   public double getThrottle() {
     return -xbox.getY(GenericHID.Hand.kLeft);

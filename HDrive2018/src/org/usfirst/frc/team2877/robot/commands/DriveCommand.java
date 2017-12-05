@@ -11,6 +11,7 @@ import org.usfirst.frc.team2877.robot.subsystems.DriveTrain;
  */
 public class DriveCommand extends Command {
 
+    boolean navxOn = false;
     boolean zeroed;
     boolean oldZeroed;
     double correctTurn;
@@ -25,16 +26,17 @@ public class DriveCommand extends Command {
     OI oi;
     DriveTrain driveTrain;
     public DriveCommand() {
-        // Use requires() here to declare subsystem dependencies
+      driveTrain = Robot.driveTrain;
+      oi = Robot.oi;
+      // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
       startAngle = driveTrain.getAngle();
-      oi = Robot.oi;
-      driveTrain = Robot.driveTrain;
       zeroed = true;
+      oldZeroed = false;
       topCorrectionSpeed = SmartDashboard.getNumber("Top Correction Speed", 1);
       midCorrectionSpeed = SmartDashboard.getNumber("Middle Correction Speed", 0.5);
       botCorrectionSpeed = SmartDashboard.getNumber("Low Correction Speed", 0.2);
@@ -44,7 +46,6 @@ public class DriveCommand extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    
       zeroed = oi.turnZeroed();
       /*if (!zeroed && oldZeroed) {
         ticker += 1;
@@ -72,9 +73,10 @@ public class DriveCommand extends Command {
       else {
           correctTurn = Robot.oi.getTurn();
       }
-      Robot.driveTrain.strafe(Robot.oi.getStrafe());
-      Robot.driveTrain.arcadeDrive(Robot.oi.getThrottle(), correctTurn);
-      oldZeroed = zeroed;      
+      Robot.driveTrain.allDrive(Robot.oi.getThrottle(), driveTrain.getNavXOn() ? correctTurn : Robot.oi.getTurn(), Robot.oi.getStrafe());
+      oldZeroed = zeroed;  
+      
+      driveTrain.checkTalonVoltage();
     }
 
     // Make this return true when this Command no longer needs to run execute()
