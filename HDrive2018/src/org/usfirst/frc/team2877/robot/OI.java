@@ -60,10 +60,10 @@ public class OI {
   }
   
   public double getStrafe() {
-    return xbox.getX(GenericHID.Hand.kLeft);
+    return -xbox.getX(GenericHID.Hand.kLeft);
   }
   
   public boolean turnZeroed() {
-    return Math.abs(getTurn()) <= 0.1;
+    return Math.abs(getTurn()) <= 0.05;
   }  
 }

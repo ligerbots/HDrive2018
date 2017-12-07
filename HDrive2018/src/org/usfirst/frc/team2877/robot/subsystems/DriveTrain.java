@@ -28,6 +28,7 @@ public class DriveTrain extends Subsystem {
     RobotDrive robotDrive;
     boolean fieldCentric = false;
     PIDController turningController;
+    double turnOutput = 0;
     
     AHRS navx;
     
@@ -39,14 +40,18 @@ public class DriveTrain extends Subsystem {
       SmartDashboard.putNumber("Top Correction Angle", 10);
       SmartDashboard.putNumber("Middle Correction Angle", 5);
       
+      SmartDashboard.putNumber("P", 0.1);
+      SmartDashboard.putNumber("I", 0);
+      SmartDashboard.putNumber("D", 0.05);
+      
       SmartDashboard.putNumber("turnP", 0.1);
       SmartDashboard.putNumber("turnI", 0);
       SmartDashboard.putNumber("turnD", 0.05);
       
-      leftMaster = new CANTalon(RobotMap.CT_LEFT_2);
-      leftSlave = new CANTalon(RobotMap.CT_LEFT_1);
-      rightMaster = new CANTalon(RobotMap.CT_RIGHT_2);
-      rightSlave = new CANTalon(RobotMap.CT_RIGHT_1);
+      leftMaster = new CANTalon(RobotMap.CT_LEFT_1);
+      leftSlave = new CANTalon(RobotMap.CT_LEFT_2);
+      rightMaster = new CANTalon(RobotMap.CT_RIGHT_1);
+      rightSlave = new CANTalon(RobotMap.CT_RIGHT_2);
       centerMaster = new CANTalon(RobotMap.CT_CENTER_1);
       centerSlave = new CANTalon(RobotMap.CT_CENTER_2);
       
@@ -67,6 +72,9 @@ public class DriveTrain extends Subsystem {
       robotDrive = new RobotDrive(leftMaster, rightMaster);
       
       navx = new AHRS(SPI.Port.kMXP, (byte) 200);
+      
+      turningController = new PIDController(0.04, 0.006, 0.05, navx,
+          output -> this.turnOutput = output);
     }
     
     public void allDrive(double throttle, double rotate, double strafe) {
@@ -116,16 +124,28 @@ public class DriveTrain extends Subsystem {
     }
     
     public void checkTalonVoltage() {
-      Arrays.asList(leftMaster, rightMaster, leftSlave, rightSlave, centerMaster, centerSlave).forEach((CANTalon talon) -> SmartDashboard.putNumber(((Integer)talon.getDeviceID()).toString(), talon.getBusVoltage()));
+      Arrays.asList(leftMaster, rightMaster, leftSlave, rightSlave, centerMaster, centerSlave).forEach((CANTalon talon) -> SmartDashboard.putNumber(((Integer)talon.getDeviceID()).toString(), talon.getOutputVoltage() * talon.getOutputCurrent()));
     }
     
-   /* public void enableTurningControl(double angle, double tolerance) {
-      double startAngle = this.getAngle();
+    double temporaryFixDegrees(double input) {
+        if (input > 180) {
+          return input - 360;
+        }
+        else if (input < -180){
+          return input + 360;
+        }
+        else {
+          return input;
+        }
+    }
+    
+    public void enableTurningControl(double angle, double tolerance) {
+      double startAngle = this.getYaw();
       double temp = startAngle + angle;
-      RobotMap.TURN_P = turningController.getP();
-      RobotMap.TURN_D = turningController.getD();
-      RobotMap.TURN_I = turningController.getI();
-      temp = otherFixDegrees(temp);
+     // RobotMap.TURN_P = turningController.getP();
+     // RobotMap.TURN_D = turningController.getD();
+     // RobotMap.TURN_I = turningController.getI();
+      temp = temporaryFixDegrees(temp);
       turningController.setSetpoint(temp);
       turningController.enable();
       turningController.setInputRange(-180.0, 180.0);
@@ -134,7 +154,7 @@ public class DriveTrain extends Subsystem {
       turningController.setToleranceBuffer(1);
       turningController.setContinuous(true);
       turningController.setSetpoint(temp);
-    }*/
+    }
 
     
     public void toggleFieldCentric() {
@@ -144,6 +164,22 @@ public class DriveTrain extends Subsystem {
         else {
           fieldCentric = true;
         }
+    }
+    
+    public void setPID (double p, double i, double d) {
+      turningController.setPID(p, i, d);
+    }
+    
+    public void disablePID () {
+      turningController.disable();
+    }
+    
+    public boolean isPidOn() {
+      return turningController.isEnabled();
+    }
+    
+    public double getTurnOutput() {
+      return turnOutput;
     }
 }
 
