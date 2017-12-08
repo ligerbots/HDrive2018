@@ -46,9 +46,9 @@ public class DriveCommand extends Command {
       botCorrectionSpeed = SmartDashboard.getNumber("Low Correction Speed", 0.2);
       topCorrectionAngle = SmartDashboard.getNumber("Top Correction Angle", 10);
       midCorrectionAngle = SmartDashboard.getNumber("Middle Correction Angle", 5);
-      p = SmartDashboard.getNumber("P", 0.1);
-      i = SmartDashboard.getNumber("I", 0);
-      d = SmartDashboard.getNumber("D", 0.05);
+      p = SmartDashboard.getNumber("P", 0.045);
+      i = SmartDashboard.getNumber("I", 0.004);
+      d = SmartDashboard.getNumber("D", 0.06);
       driveTrain.setPID(p, i, d);
     }
 

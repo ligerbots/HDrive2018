@@ -29,6 +29,7 @@ public class DriveTrain extends Subsystem {
     boolean fieldCentric = false;
     PIDController turningController;
     double turnOutput = 0;
+    double limitedStrafe = 0;
     
     AHRS navx;
     
@@ -40,13 +41,15 @@ public class DriveTrain extends Subsystem {
       SmartDashboard.putNumber("Top Correction Angle", 10);
       SmartDashboard.putNumber("Middle Correction Angle", 5);
       
-      SmartDashboard.putNumber("P", 0.1);
-      SmartDashboard.putNumber("I", 0);
-      SmartDashboard.putNumber("D", 0.05);
+      SmartDashboard.putNumber("P", 0.045);
+      SmartDashboard.putNumber("I", 0.004);
+      SmartDashboard.putNumber("D", 0.06);
       
       SmartDashboard.putNumber("turnP", 0.1);
       SmartDashboard.putNumber("turnI", 0);
       SmartDashboard.putNumber("turnD", 0.05);
+      
+      SmartDashboard.putNumber("Strafe Ramp Rate", 0.08);
       
       leftMaster = new CANTalon(RobotMap.CT_LEFT_1);
       leftSlave = new CANTalon(RobotMap.CT_LEFT_2);
@@ -73,7 +76,7 @@ public class DriveTrain extends Subsystem {
       
       navx = new AHRS(SPI.Port.kMXP, (byte) 200);
       
-      turningController = new PIDController(0.04, 0.006, 0.05, navx,
+      turningController = new PIDController(0.045, 0.004, 0.06, navx,
           output -> this.turnOutput = output);
     }
     
@@ -84,8 +87,23 @@ public class DriveTrain extends Subsystem {
         centerMaster.set(strafe * Math.sin(getYaw()) / scale);
       }
       else {
+        double rampRate = SmartDashboard.getNumber("Strafe Ramp Rate", 0.08);
+        double change = throttle - limitedStrafe;
+        if (throttle > 0 && change > 0) {
+          if (change > rampRate) { //volts per tick
+            change = rampRate;
+          }
+          limitedStrafe += change;
+        } else if (throttle < 0 && change < 0) {
+          if (change < -rampRate) {
+            change = -rampRate;
+          }
+          limitedStrafe += change;
+        } else {
+          limitedStrafe = throttle;
+        }
         robotDrive.arcadeDrive(throttle, rotate);
-        centerMaster.set(strafe);
+        centerMaster.set(limitedStrafe);
       }
     }
     
