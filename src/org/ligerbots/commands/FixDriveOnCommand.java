@@ -1,7 +1,8 @@
-package org.usfirst.frc.team2877.robot.commands;
+package org.ligerbots.commands;
+
+import org.ligerbots.Robot;
 
 import edu.wpi.first.wpilibj.command.Command;
-import org.usfirst.frc.team2877.robot.Robot;
 
 /**
  *

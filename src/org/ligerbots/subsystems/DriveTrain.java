@@ -1,4 +1,4 @@
-package org.usfirst.frc.team2877.robot.subsystems;
+package org.ligerbots.subsystems;
 
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.TalonControlMode;
@@ -9,7 +9,8 @@ import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.Arrays;
-import org.usfirst.frc.team2877.robot.RobotMap;
+
+import org.ligerbots.RobotMap;
 
 /**
  *

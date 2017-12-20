@@ -1,5 +1,8 @@
 
-package org.usfirst.frc.team2877.robot;
+package org.ligerbots;
+
+import org.ligerbots.commands.DriveCommand;
+import org.ligerbots.subsystems.DriveTrain;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.command.Command;
@@ -7,8 +10,6 @@ import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import org.usfirst.frc.team2877.robot.commands.DriveCommand;
-import org.usfirst.frc.team2877.robot.subsystems.DriveTrain;
 
 /**
  * The VM is configured to automatically run this class, and to call the

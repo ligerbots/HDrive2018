@@ -1,10 +1,11 @@
-package org.usfirst.frc.team2877.robot;
+package org.ligerbots;
+
+import org.ligerbots.commands.FixDriveOnCommand;
+import org.ligerbots.commands.ToggleFieldCentric;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
-import org.usfirst.frc.team2877.robot.commands.FixDriveOnCommand;
-import org.usfirst.frc.team2877.robot.commands.ToggleFieldCentric;
 
 
 /**

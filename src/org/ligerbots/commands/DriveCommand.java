@@ -1,10 +1,11 @@
-package org.usfirst.frc.team2877.robot.commands;
+package org.ligerbots.commands;
+
+import org.ligerbots.OI;
+import org.ligerbots.Robot;
+import org.ligerbots.subsystems.DriveTrain;
 
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import org.usfirst.frc.team2877.robot.OI;
-import org.usfirst.frc.team2877.robot.Robot;
-import org.usfirst.frc.team2877.robot.subsystems.DriveTrain;
 
 /**
  *

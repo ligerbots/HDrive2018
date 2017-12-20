@@ -1,4 +1,4 @@
-package org.usfirst.frc.team2877.robot;
+package org.ligerbots;
 
 /**
  * The RobotMap is a mapping from the ports sensors and actuators are wired into
