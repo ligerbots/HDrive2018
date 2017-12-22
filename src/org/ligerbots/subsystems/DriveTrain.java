@@ -81,15 +81,15 @@ public class DriveTrain extends Subsystem {
           output -> this.turnOutput = output);
     }
     
+    double rampRate;
     public void allDrive(double throttle, double rotate, double strafe) {
       if (fieldCentric) {
-        double scale = Math.max(Math.sin(getYaw()), Math.cos(getYaw()));
-        robotDrive.arcadeDrive(throttle * Math.cos(getYaw()) / scale, rotate);
-        centerMaster.set(strafe * Math.sin(getYaw()) / scale);
+        robotDrive.arcadeDrive(throttle * Math.cos(getYaw() + strafe * Math.sin(getYaw())), rotate);
+        centerMaster.set(-throttle * Math.sin(getYaw()) + strafe * Math.cos(getYaw()));
       }
       else {
-        double rampRate = SmartDashboard.getNumber("Strafe Ramp Rate", 0.08);
-        double change = throttle - limitedStrafe;
+        rampRate = SmartDashboard.getNumber("Strafe Ramp Rate", 0.08);
+        /*double change = throttle - limitedStrafe;
         if (throttle > 0 && change > 0) {
           if (change > rampRate) { //volts per tick
             change = rampRate;
@@ -102,9 +102,10 @@ public class DriveTrain extends Subsystem {
           limitedStrafe += change;
         } else {
           limitedStrafe = throttle;
-        }
+        }*/
+        centerMaster.setVoltageRampRate(rampRate);
         robotDrive.arcadeDrive(throttle, rotate);
-        centerMaster.set(limitedStrafe);
+        centerMaster.set(strafe);
       }
     }
     
