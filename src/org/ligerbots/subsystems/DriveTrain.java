@@ -1,10 +1,14 @@
 package org.ligerbots.subsystems;
 
-import com.ctre.CANTalon;
-import com.ctre.CANTalon.TalonControlMode;
+import com.ctre.phoenix.*;
+import com.ctre.phoenix.MotorControl.*;
+import com.ctre.phoenix.MotorControl.ControlMode;
+import com.ctre.phoenix.MotorControl.CAN.TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.PIDController;
-import edu.wpi.first.wpilibj.RobotDrive;
+import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.SpeedControllerGroup;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -19,14 +23,16 @@ public class DriveTrain extends Subsystem {
 
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
-    CANTalon leftMaster;
+    TalonSRX leftMaster;
     boolean navxOn = false;
-    CANTalon leftSlave;
-    CANTalon rightMaster;
-    CANTalon rightSlave;
-    CANTalon centerMaster;
-    CANTalon centerSlave;
-    RobotDrive robotDrive;
+    TalonSRX leftSlave;
+    TalonSRX rightMaster;
+    TalonSRX rightSlave;
+    TalonSRX centerMaster;
+    TalonSRX centerSlave;
+    SpeedControllerGroup left;
+    SpeedControllerGroup right;
+    DifferentialDrive robotDrive;
     boolean fieldCentric = false;
     PIDController turningController;
     double turnOutput = 0;
@@ -52,28 +58,39 @@ public class DriveTrain extends Subsystem {
       
       SmartDashboard.putNumber("Strafe Ramp Rate", 0.08);
       
-      leftMaster = new CANTalon(RobotMap.CT_LEFT_1);
-      leftSlave = new CANTalon(RobotMap.CT_LEFT_2);
-      rightMaster = new CANTalon(RobotMap.CT_RIGHT_1);
-      rightSlave = new CANTalon(RobotMap.CT_RIGHT_2);
-      centerMaster = new CANTalon(RobotMap.CT_CENTER_1);
-      centerSlave = new CANTalon(RobotMap.CT_CENTER_2);
+      leftMaster = new TalonSRX(RobotMap.CT_LEFT_1);
+      leftSlave = new TalonSRX(RobotMap.CT_LEFT_2);
+      rightMaster = new TalonSRX(RobotMap.CT_RIGHT_1);
+      rightSlave = new TalonSRX(RobotMap.CT_RIGHT_2);
+      centerMaster = new TalonSRX(RobotMap.CT_CENTER_1);
+      centerSlave = new TalonSRX(RobotMap.CT_CENTER_2);
       
-      leftMaster.changeControlMode(TalonControlMode.PercentVbus);
-      rightMaster.changeControlMode(TalonControlMode.PercentVbus);
-      centerMaster.changeControlMode(TalonControlMode.PercentVbus);
+      // With the new SpeedControlGroups, do we have to do this ourselves anymore?
+      //leftSlave.set(ControlMode.Follower, leftMaster.getDeviceID());
+      //rightSlave.set(ControlMode.Follower, rightMaster.getDeviceID());
       
-      leftSlave.changeControlMode(TalonControlMode.Follower);
-      rightSlave.changeControlMode(TalonControlMode.Follower);
-      centerSlave.changeControlMode(TalonControlMode.Follower);
+      centerSlave.set(ControlMode.Follower, centerMaster.getDeviceID());	// center is different
       
-      leftSlave.set(RobotMap.CT_LEFT_1);
-      rightSlave.set(RobotMap.CT_RIGHT_1);
-      centerSlave.set(RobotMap.CT_CENTER_1);
+      left = new SpeedControllerGroup((SpeedController)leftMaster, (SpeedController)leftSlave);
+      right = new SpeedControllerGroup((SpeedController)rightMaster, (SpeedController)rightSlave);
+
+
+// deprecated CANTalon methods of doing things:      
+//      leftMaster.changeControlMode(TalonControlMode.PercentVbus);
+//      rightMaster.changeControlMode(TalonControlMode.PercentVbus);
+//      centerMaster.changeControlMode(TalonControlMode.PercentVbus);
       
-      Arrays.asList(leftMaster, rightMaster, leftSlave, rightSlave, centerMaster, centerSlave).forEach((CANTalon talon) -> talon.enableBrakeMode(true));
+//      leftSlave.changeControlMode(TalonControlMode.Follower);
+//      rightSlave.changeControlMode(TalonControlMode.Follower);
+//      centerSlave.changeControlMode(TalonControlMode.Follower);
       
-      robotDrive = new RobotDrive(leftMaster, rightMaster);
+//      leftSlave.set(RobotMap.CT_LEFT_1);
+//      rightSlave.set(RobotMap.CT_RIGHT_1);
+//      centerSlave.set(RobotMap.CT_CENTER_1);
+      
+      Arrays.asList(leftMaster, rightMaster, leftSlave, rightSlave, centerMaster, centerSlave).forEach((TalonSRX talon) -> talon.setNeutralMode(NeutralMode.Brake));
+      
+      robotDrive = new DifferentialDrive(left, right);
       
       navx = new AHRS(SPI.Port.kMXP, (byte) 200);
       
@@ -85,10 +102,10 @@ public class DriveTrain extends Subsystem {
     public void allDrive(double throttle, double rotate, double strafe) {
       if (fieldCentric) {
         robotDrive.arcadeDrive(throttle * Math.cos(getYaw() + strafe * Math.sin(getYaw())), rotate);
-        centerMaster.set(-throttle * Math.sin(getYaw()) + strafe * Math.cos(getYaw()));
+        centerMaster.set(ControlMode.PercentOutput, -throttle * Math.sin(getYaw()) + strafe * Math.cos(getYaw()));
       }
       else {
-        rampRate = SmartDashboard.getNumber("Strafe Ramp Rate", 0.08);
+        rampRate = SmartDashboard.getNumber("Strafe Ramp Rate", 0.3);
         /*double change = throttle - limitedStrafe;
         if (throttle > 0 && change > 0) {
           if (change > rampRate) { //volts per tick
@@ -103,14 +120,14 @@ public class DriveTrain extends Subsystem {
         } else {
           limitedStrafe = throttle;
         }*/
-        centerMaster.setVoltageRampRate(rampRate);
+        centerMaster.configOpenloopRamp(0.3, 1000);
         robotDrive.arcadeDrive(throttle, rotate);
-        centerMaster.set(strafe);
+        centerMaster.set(ControlMode.PercentOutput, strafe);
       }
     }
     
     public void strafe(double x) {
-      centerMaster.set(x);
+        centerMaster.set(ControlMode.PercentOutput, x);
     }
     
     public double getYaw() {
@@ -144,7 +161,8 @@ public class DriveTrain extends Subsystem {
     }
     
     public void checkTalonVoltage() {
-      Arrays.asList(leftMaster, rightMaster, leftSlave, rightSlave, centerMaster, centerSlave).forEach((CANTalon talon) -> SmartDashboard.putNumber(((Integer)talon.getDeviceID()).toString(), talon.getOutputVoltage() * talon.getOutputCurrent()));
+      Arrays.asList(leftMaster, rightMaster, leftSlave, rightSlave, centerMaster, centerSlave).forEach((TalonSRX talon) -> 
+      	SmartDashboard.putNumber(((Integer)talon.getDeviceID()).toString(), talon.getMotorOutputVoltage() * talon.getOutputCurrent()));
     }
     
     double temporaryFixDegrees(double input) {
