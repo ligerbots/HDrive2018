@@ -37,8 +37,19 @@ public class DriveTrain extends Subsystem {
     PIDController turningController;
     double turnOutput = 0;
     double limitedStrafe = 0;
+    TalonID[] talons;
     
     AHRS navx;
+    
+    public class TalonID {
+  	  int talonID;
+  	  TalonSRX talon;
+  	  public TalonID (int talonID, TalonSRX talon) {
+  		  this.talonID = talonID;
+  		  this.talon = talon;
+  	  }
+  	
+    }
     
     public DriveTrain() {
       
@@ -69,11 +80,13 @@ public class DriveTrain extends Subsystem {
       //leftSlave.set(ControlMode.Follower, leftMaster.getDeviceID());
       //rightSlave.set(ControlMode.Follower, rightMaster.getDeviceID());
       
-      centerSlave.set(ControlMode.Follower, centerMaster.getDeviceID());	// center is different
+      centerSlave.set(ControlMode.Follower, RobotMap.CT_CENTER_2);	// center is different
+      System.out.println("Center Master Device ID: " + ((Integer)centerMaster.getDeviceID()).toString());
       
-      left = new SpeedControllerGroup((SpeedController)leftMaster, (SpeedController)leftSlave);
-      right = new SpeedControllerGroup((SpeedController)rightMaster, (SpeedController)rightSlave);
+      left = new SpeedControllerGroup(leftMaster.getWPILIB_SpeedController(), leftSlave.getWPILIB_SpeedController());
+      right = new SpeedControllerGroup(rightMaster.getWPILIB_SpeedController(), rightSlave.getWPILIB_SpeedController());
 
+      
 
 // deprecated CANTalon methods of doing things:      
 //      leftMaster.changeControlMode(TalonControlMode.PercentVbus);
@@ -89,6 +102,13 @@ public class DriveTrain extends Subsystem {
 //      centerSlave.set(RobotMap.CT_CENTER_1);
       
       Arrays.asList(leftMaster, rightMaster, leftSlave, rightSlave, centerMaster, centerSlave).forEach((TalonSRX talon) -> talon.setNeutralMode(NeutralMode.Brake));
+      
+      talons = new TalonID[] {new TalonID(RobotMap.CT_LEFT_1, leftMaster), 
+    		  new TalonID(RobotMap.CT_LEFT_2, leftSlave), 
+    		  new TalonID(RobotMap.CT_RIGHT_1, rightMaster),
+    		  new TalonID(RobotMap.CT_RIGHT_2, rightSlave),
+    		  new TalonID(RobotMap.CT_CENTER_1, centerMaster),
+    		  new TalonID(RobotMap.CT_CENTER_2, centerSlave)};
       
       robotDrive = new DifferentialDrive(left, right);
       
@@ -120,7 +140,7 @@ public class DriveTrain extends Subsystem {
         } else {
           limitedStrafe = throttle;
         }*/
-        centerMaster.configOpenloopRamp(0.3, 1000);
+        //centerMaster.configOpenloopRamp(0.3, 1000);
         robotDrive.arcadeDrive(throttle, rotate);
         centerMaster.set(ControlMode.PercentOutput, strafe);
       }
@@ -161,8 +181,9 @@ public class DriveTrain extends Subsystem {
     }
     
     public void checkTalonVoltage() {
-      Arrays.asList(leftMaster, rightMaster, leftSlave, rightSlave, centerMaster, centerSlave).forEach((TalonSRX talon) -> 
-      	SmartDashboard.putNumber(((Integer)talon.getDeviceID()).toString(), talon.getMotorOutputVoltage() * talon.getOutputCurrent()));
+      for (TalonID talon : talons) {
+      	SmartDashboard.putNumber(((Integer)talon.talonID).toString(), talon.talon.getMotorOutputVoltage() * talon.talon.getOutputCurrent());
+      }
     }
     
     double temporaryFixDegrees(double input) {
