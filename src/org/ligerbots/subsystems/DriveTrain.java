@@ -160,7 +160,7 @@ public class DriveTrain extends Subsystem {
         }*/
         //centerMaster.configOpenloopRamp(0.3, 1000);
         robotDrive.arcadeDrive(throttle, rotate);
-        centerMaster.set(ControlMode.PercentOutput, strafe);
+        if (HDRIVE_PRESENT) centerMaster.set(ControlMode.PercentOutput, strafe);
       }
     }
     
