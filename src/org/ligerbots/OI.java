@@ -1,7 +1,10 @@
 package org.ligerbots;
 
 import org.ligerbots.commands.FixDriveOnCommand;
+import org.ligerbots.commands.LEDChangeColor;
 import org.ligerbots.commands.ToggleFieldCentric;
+import org.ligerbots.triggers.JoystickPov;
+import org.ligerbots.triggers.JoystickPov.Direction;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -45,12 +48,17 @@ public class OI {
   
   public OI() {
     xbox = new XboxController(0);
+    final LEDChangeColor ledChangeColor = new LEDChangeColor(1);
     
     JoystickButton xBoxA = new JoystickButton(xbox, 1);
     xBoxA.whenPressed(new ToggleFieldCentric());
     
     JoystickButton xBoxB = new JoystickButton(xbox , 2);
     xBoxB.whenPressed(new FixDriveOnCommand());
+    
+    // button for playing with LED strip
+    JoystickPov cycleLEDStrip = new JoystickPov(xbox, Direction.NORTH);
+    cycleLEDStrip.whenPressed(ledChangeColor);    
   }
   public double getThrottle() {
     return -xbox.getY(GenericHID.Hand.kLeft);

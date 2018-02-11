@@ -2,6 +2,9 @@
 package org.ligerbots;
 
 import org.ligerbots.commands.DriveCommand;
+import org.ligerbots.commands.LEDChangeColor;
+import org.ligerbots.commands.LEDStripCommand;
+import org.ligerbots.subsystems.LEDStrip;
 import org.ligerbots.subsystems.DriveTrain;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
@@ -22,6 +25,8 @@ public class Robot extends IterativeRobot {
 	public static OI oi;
 	public static DriveTrain driveTrain;
     public static DriveCommand driveCommand;
+    public static LEDStripCommand ledStripCommand;
+    public static LEDStrip ledStrip;
     
 	Command autonomousCommand;
 	
@@ -32,10 +37,13 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void robotInit() {
 	    driveTrain = new DriveTrain();
+	    ledStrip = new LEDStrip();
 		oi = new OI();
 		driveCommand = new DriveCommand();
+		ledStripCommand = new LEDStripCommand();
 		//chooser.addDefault("Default Auto", new ExampleCommand());
 		// chooser.addObject("My Auto", new MyAutoCommand());
+		ledStripCommand.start();
 	}
 
 	/**
@@ -47,6 +55,7 @@ public class Robot extends IterativeRobot {
 	public void disabledInit() {
 
 	}
+
 
 	@Override
 	public void disabledPeriodic() {
@@ -104,6 +113,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
+		//SmartDashboard.putData();
 	}
 
 	/**
@@ -113,4 +123,6 @@ public class Robot extends IterativeRobot {
 	public void testPeriodic() {
 		LiveWindow.run();
 	}
+	
+
 }
