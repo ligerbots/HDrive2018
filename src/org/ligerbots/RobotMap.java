@@ -21,8 +21,8 @@ public class RobotMap {
     public static final int CT_LEFT_2 = 4;
     public static final int CT_RIGHT_1 = 3; 
     public static final int CT_RIGHT_2 = 6;
-    public static final int CT_CENTER_1 = 3;
-    public static final int CT_CENTER_2 = 6;
+    public static final int CT_CENTER_1 = 33;	// fix these numbers when we put it back on
+    public static final int CT_CENTER_2 = 66;
     
     public static final int LED_PWM_CHANNEL = 9;
 }

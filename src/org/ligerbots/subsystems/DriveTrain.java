@@ -53,7 +53,7 @@ public class DriveTrain extends Subsystem {
     
     public DriveTrain() {
       
-      SmartDashboard.putNumber("Top Correction Speed", 1);
+/*      SmartDashboard.putNumber("Top Correction Speed", 1);
       SmartDashboard.putNumber("Middle Correction Speed", 0.5);
       SmartDashboard.putNumber("Low Correction Speed", 0.2);
       SmartDashboard.putNumber("Top Correction Angle", 10);
@@ -67,7 +67,7 @@ public class DriveTrain extends Subsystem {
       SmartDashboard.putNumber("turnI", 0);
       SmartDashboard.putNumber("turnD", 0.05);
       
-      SmartDashboard.putNumber("Strafe Ramp Rate", 0.08);
+      SmartDashboard.putNumber("Strafe Ramp Rate", 0.08); */
       
       leftMaster = new TalonSRX(RobotMap.CT_LEFT_1);
       leftSlave = new TalonSRX(RobotMap.CT_LEFT_2);
@@ -77,8 +77,8 @@ public class DriveTrain extends Subsystem {
       centerSlave = new TalonSRX(RobotMap.CT_CENTER_2);
       
       // With the new SpeedControlGroups, do we have to do this ourselves anymore?
-      //leftSlave.set(ControlMode.Follower, leftMaster.getDeviceID());
-      //rightSlave.set(ControlMode.Follower, rightMaster.getDeviceID());
+      leftSlave.set(ControlMode.Follower, leftMaster.getDeviceID());
+      rightSlave.set(ControlMode.Follower, rightMaster.getDeviceID());
       
       centerSlave.set(ControlMode.Follower, RobotMap.CT_CENTER_2);	// center is different
       System.out.println("Center Master Device ID: " + ((Integer)centerMaster.getDeviceID()).toString());
