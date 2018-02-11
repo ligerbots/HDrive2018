@@ -55,6 +55,9 @@ public class DriveCommand extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
+      if (ticker++ >= 50) ticker = 0;
+    	
+    	
       zeroed = oi.turnZeroed();
       /*if (!zeroed && oldZeroed) {
         ticker += 1;
@@ -99,7 +102,7 @@ public class DriveCommand extends Command {
       SmartDashboard.putBoolean("Zeroed?", zeroed);
       SmartDashboard.putNumber("Start Angle", startAngle);
       
-      driveTrain.checkTalonVoltage();
+      if ((ticker%10) ==0) driveTrain.displayTalonWattage();
     }
 
     // Make this return true when this Command no longer needs to run execute()
