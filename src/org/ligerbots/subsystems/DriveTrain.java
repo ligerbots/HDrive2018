@@ -1,9 +1,9 @@
 package org.ligerbots.subsystems;
 
 import com.ctre.phoenix.*;
-import com.ctre.phoenix.MotorControl.*;
-import com.ctre.phoenix.MotorControl.ControlMode;
-import com.ctre.phoenix.MotorControl.CAN.TalonSRX;
+import com.ctre.phoenix.motorcontrol.*;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.SpeedController;
@@ -83,8 +83,8 @@ public class DriveTrain extends Subsystem {
       centerSlave.set(ControlMode.Follower, RobotMap.CT_CENTER_2);	// center is different
       System.out.println("Center Master Device ID: " + ((Integer)centerMaster.getDeviceID()).toString());
       
-      left = new SpeedControllerGroup(leftMaster.getWPILIB_SpeedController(), leftSlave.getWPILIB_SpeedController());
-      right = new SpeedControllerGroup(rightMaster.getWPILIB_SpeedController(), rightSlave.getWPILIB_SpeedController());
+      left = new SpeedControllerGroup((SpeedController)leftMaster, (SpeedController)leftSlave);
+      right = new SpeedControllerGroup((SpeedController)rightMaster, (SpeedController)rightSlave);
 
       
 
