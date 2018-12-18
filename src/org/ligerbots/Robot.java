@@ -1,15 +1,13 @@
 
 package org.ligerbots;
 
-import org.ligerbots.commands.DriveCommand;
-import org.ligerbots.subsystems.DriveTrain;
-
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.ligerbots.commands.DriveCommand;
+import org.ligerbots.subsystems.DriveTrain;
+import org.ligerbots.subsystems.ProximitySensor;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -22,6 +20,8 @@ public class Robot extends IterativeRobot {
 	public static OI oi;
 	public static DriveTrain driveTrain;
     public static DriveCommand driveCommand;
+    public static ProximitySensor proximitySensor;
+    
     
 	Command autonomousCommand;
 	
@@ -34,6 +34,7 @@ public class Robot extends IterativeRobot {
 	    driveTrain = new DriveTrain();
 		oi = new OI();
 		driveCommand = new DriveCommand();
+		proximitySensor = new ProximitySensor();
 		//chooser.addDefault("Default Auto", new ExampleCommand());
 		// chooser.addObject("My Auto", new MyAutoCommand());
 	}

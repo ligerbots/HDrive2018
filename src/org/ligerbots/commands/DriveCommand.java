@@ -55,6 +55,7 @@ public class DriveCommand extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
+      Robot.proximitySensor.sendDataToSmartDashboard();
       zeroed = oi.turnZeroed();
       /*if (!zeroed && oldZeroed) {
         ticker += 1;

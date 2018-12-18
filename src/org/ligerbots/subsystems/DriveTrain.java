@@ -2,7 +2,7 @@ package org.ligerbots.subsystems;
 
 import com.ctre.phoenix.*;
 import com.ctre.phoenix.motorcontrol.*;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.PIDController;
@@ -23,13 +23,13 @@ public class DriveTrain extends Subsystem {
 
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
-    TalonSRX leftMaster;
+    WPI_TalonSRX leftMaster;
     boolean navxOn = false;
-    TalonSRX leftSlave;
-    TalonSRX rightMaster;
-    TalonSRX rightSlave;
-    TalonSRX centerMaster;
-    TalonSRX centerSlave;
+    WPI_TalonSRX leftSlave;
+    WPI_TalonSRX rightMaster;
+    WPI_TalonSRX rightSlave;
+    WPI_TalonSRX centerMaster;
+    WPI_TalonSRX centerSlave;
     SpeedControllerGroup left;
     SpeedControllerGroup right;
     DifferentialDrive robotDrive;
@@ -43,8 +43,8 @@ public class DriveTrain extends Subsystem {
     
     public class TalonID {
   	  int talonID;
-  	  TalonSRX talon;
-  	  public TalonID (int talonID, TalonSRX talon) {
+  	  WPI_TalonSRX talon;
+  	  public TalonID (int talonID, WPI_TalonSRX talon) {
   		  this.talonID = talonID;
   		  this.talon = talon;
   	  }
@@ -69,22 +69,22 @@ public class DriveTrain extends Subsystem {
       
       SmartDashboard.putNumber("Strafe Ramp Rate", 0.08);
       
-      leftMaster = new TalonSRX(RobotMap.CT_LEFT_1);
-      leftSlave = new TalonSRX(RobotMap.CT_LEFT_2);
-      rightMaster = new TalonSRX(RobotMap.CT_RIGHT_1);
-      rightSlave = new TalonSRX(RobotMap.CT_RIGHT_2);
-      centerMaster = new TalonSRX(RobotMap.CT_CENTER_1);
-      centerSlave = new TalonSRX(RobotMap.CT_CENTER_2);
+      leftMaster = new WPI_TalonSRX(RobotMap.CT_LEFT_1);
+      leftSlave = new WPI_TalonSRX(RobotMap.CT_LEFT_2);
+      rightMaster = new WPI_TalonSRX(RobotMap.CT_RIGHT_1);
+      rightSlave = new WPI_TalonSRX(RobotMap.CT_RIGHT_2);
+      centerMaster = new WPI_TalonSRX(RobotMap.CT_CENTER_1);
+      //centerSlave = new WPI_TalonSRX(RobotMap.CT_CENTER_2);
       
       // With the new SpeedControlGroups, do we have to do this ourselves anymore?
       //leftSlave.set(ControlMode.Follower, leftMaster.getDeviceID());
       //rightSlave.set(ControlMode.Follower, rightMaster.getDeviceID());
       
-      centerSlave.set(ControlMode.Follower, RobotMap.CT_CENTER_2);	// center is different
+      //centerSlave.set(ControlMode.Follower, RobotMap.CT_CENTER_2);	// center is different
       System.out.println("Center Master Device ID: " + ((Integer)centerMaster.getDeviceID()).toString());
       
-      left = new SpeedControllerGroup((SpeedController)leftMaster, (SpeedController)leftSlave);
-      right = new SpeedControllerGroup((SpeedController)rightMaster, (SpeedController)rightSlave);
+      left = new SpeedControllerGroup(leftMaster, leftSlave);
+      right = new SpeedControllerGroup(rightMaster, rightSlave);
 
       
 
@@ -101,7 +101,7 @@ public class DriveTrain extends Subsystem {
 //      rightSlave.set(RobotMap.CT_RIGHT_1);
 //      centerSlave.set(RobotMap.CT_CENTER_1);
       
-      Arrays.asList(leftMaster, rightMaster, leftSlave, rightSlave, centerMaster, centerSlave).forEach((TalonSRX talon) -> talon.setNeutralMode(NeutralMode.Brake));
+      Arrays.asList(leftMaster, rightMaster, leftSlave, rightSlave, centerMaster/*, centerSlave*/).forEach((WPI_TalonSRX talon) -> talon.setNeutralMode(NeutralMode.Brake));
       
       talons = new TalonID[] {new TalonID(RobotMap.CT_LEFT_1, leftMaster), 
     		  new TalonID(RobotMap.CT_LEFT_2, leftSlave), 
@@ -121,7 +121,9 @@ public class DriveTrain extends Subsystem {
     double rampRate;
     public void allDrive(double throttle, double rotate, double strafe) {
       if (fieldCentric) {
-        robotDrive.arcadeDrive(throttle * Math.cos(getYaw() + strafe * Math.sin(getYaw())), rotate);
+        // we threw the negative sign in front of rotate here because the robot was turning in the wrong direction
+        // -cbf 2018-01-16
+        robotDrive.arcadeDrive(throttle * Math.cos(getYaw() + strafe * Math.sin(getYaw())), -rotate);
         centerMaster.set(ControlMode.PercentOutput, -throttle * Math.sin(getYaw()) + strafe * Math.cos(getYaw()));
       }
       else {
